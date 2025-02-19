@@ -20,7 +20,7 @@ public partial class NewsArticle : IEntity<string>
 
     public short? CategoryId { get; set; }
 
-    public bool? NewsStatus { get; set; }
+    public bool NewsStatus { get; set; }
 
     public short? CreatedById { get; set; }
 

@@ -1,91 +1,212 @@
 ﻿@model IEnumerable<FUNews.DAL.Entities.NewsArticle>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "News Management";
 }
 
-<h1>Index</h1>
-<form asp-controller="SystemAccounts" asp-action="Logout" method="post">
-    <button type="submit">Logout</button>
-</form>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsTitle)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Headline)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsContent)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsSource)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedById)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ModifiedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Headline)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsContent)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsSource)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedById)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModifiedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy.AccountName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.NewsArticleId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NewsArticleId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NewsArticleId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">@ViewData["Title"]</h1>
+        </div>
+
+        <!-- Nút tạo mới -->
+        <div class="mb-4">
+            <button id="openCreateNewsModal" class="btn btn-success shadow-sm">➕ Create New Article</button>
+        </div>
+
+        <!-- Bảng danh sách bài viết -->
+        <div class="table-responsive shadow-sm rounded bg-white p-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>📜 Title</th>
+                        <th>📰 Headline</th>
+                        <th>📖 Content</th>
+                        <th>🔗 Source</th>
+                        <th>📡 Status</th>
+                        <th>🏷️ Category</th>
+                        <th class="text-center">⚡ Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.NewsTitle</td>
+                            <td>@item.Headline</td>
+                            <td>@item.NewsContent.Substring(0, Math.Min(item.NewsContent.Length, 50))...</td>
+                            <td>@item.NewsSource</td>
+                            <td>
+                                <span class="badge bg-@(item.NewsStatus ? "success" : "secondary")">
+                                    @(item.NewsStatus ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>@item.Category?.CategoryName</td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-outline-primary me-1">👁️ Details</a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-warning me-1 edit-news-btn" data-id="@item.NewsArticleId">✏️ Edit</a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-news-btn" data-id="@item.NewsArticleId" data-title="@item.NewsTitle">🗑️ Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Create Popup -->
+    <div class="modal fade" id="createNewsModal" tabindex="-1" aria-labelledby="createNewsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createNewsModalLabel">✨ Create New Article</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="createNewsModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Popup -->
+    <div class="modal fade" id="editNewsModal" tabindex="-1" aria-labelledby="editNewsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editNewsModalLabel">📝 Edit Article</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="editNewsModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Delete Confirmation -->
+    <div class="modal fade" id="deleteNewsModal" tabindex="-1" aria-labelledby="deleteNewsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteNewsModalLabel">🗑️ Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="deleteNewsModalContent">
+                    @Html.AntiForgeryToken()
+                    <p>⚠️ Are you sure you want to delete <strong id="deleteNewsTitle"></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+                    <button type="button" id="confirmDeleteNewsBtn" class="btn btn-danger">🗑️ Confirm Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Create News Script -->
+  
+    <script>
+        document.getElementById('openCreateNewsModal').addEventListener('click', function () {
+            fetch('/NewsArticles/CreatePartial')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('createNewsModalContent').innerHTML = html;
+                    const createModal = new bootstrap.Modal(document.getElementById('createNewsModal'));
+                    createModal.show();
+
+                    // Reset nội dung modal khi đóng
+                    document.getElementById('createNewsArticleForm').addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const form = this;
+                        const formData = new URLSearchParams(new FormData(form)).toString();
+                        const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                        fetch('/NewsArticles/CreatePartial', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'RequestVerificationToken': token
+                            },
+                            body: formData
+                        })
+                            .then(response => response.redirected ? window.location.href = response.url : response.text())
+                            .then(data => { if (data) document.getElementById('createNewsModalContent').innerHTML = data; })
+                            .catch(() => alert('⚡ Có lỗi xảy ra khi gửi form.'));
+                    });
+                });
+        });
+    </script>
+    
+
+    <!-- Edit News Script -->
+    <script>
+       document.addEventListener('click', function (e) {
+    if (e.target && e.target.classList.contains('edit-news-btn')) {
+        const NewsArticleId = e.target.getAttribute('data-id');
+        fetch(`/NewsArticles/EditPartial/${NewsArticleId}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('editNewsModalContent').innerHTML = html;
+                const modal = new bootstrap.Modal(document.getElementById('editNewsModal'));
+                modal.show();
+
+                // Handle form submission for editing
+                document.getElementById('editNewsArticleForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const form = this;
+                    const formData = new URLSearchParams(new FormData(form)).toString();
+                    const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                    fetch('/NewsArticles/EditPartial', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': token
+                        },
+                        body: formData
+                    })
+                    .then(response => response.redirected ? window.location.href = response.url : response.text())
+                    .then(data => { 
+                        if (data) document.getElementById('editNewsModalContent').innerHTML = data; 
+                    })
+                    .catch(() => alert('⚡ Có lỗi xảy ra khi cập nhật bài viết.'));
+                });
+            })
+            .catch(() => alert('⚡ Không thể tải dữ liệu chỉnh sửa.'));
+    }
+});
+
+    </script>
+
+    <!-- Delete News Script -->
+    <script>
+        let deleteNewsId;
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('delete-news-btn')) {
+                deleteNewsId = e.target.getAttribute('data-id');
+                const newsTitle = e.target.getAttribute('data-title');
+                document.getElementById('deleteNewsTitle').textContent = newsTitle;
+                new bootstrap.Modal(document.getElementById('deleteNewsModal')).show();
+            }
+        });
+
+        document.getElementById('confirmDeleteNewsBtn').addEventListener('click', function () {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            fetch(`/NewsArticles/Delete/${deleteNewsId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `__RequestVerificationToken=${token}`
+            })
+                .then(response => response.redirected ? window.location.href = response.url : alert('❌ Delete failed.'));
+        });
+    </script>
+</body>
+</html>

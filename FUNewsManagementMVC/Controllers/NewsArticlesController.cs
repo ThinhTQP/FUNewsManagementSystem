@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FUNews.MVC.Controllers
 {
-   
+
     public class NewsArticlesController : Controller
     {
         private readonly NewsArticleService _newsArticleService;
@@ -43,52 +43,57 @@ namespace FUNews.MVC.Controllers
         }
 
         // GET: NewsArticles/Create
+
         [Authorize(Policy = "StaffOnly")]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> CreatePartial()
         {
+            // Fetch categories and tags for the select lists
             ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategoriesAsync(), "CategoryId", "CategoryName");
-            ViewBag.TagIds = new MultiSelectList(await _tagService.GetAllTagsAsync(), "TagId", "TagName");
-            return View();
+            var tags = await _tagService.GetAllTagsAsync();
+            ViewBag.TagIds = new MultiSelectList(tags, "TagId", "TagName");
+
+            // Return the partial view with an empty NewsArticle
+            return PartialView("CreatePartial", new NewsArticle());
         }
 
         // POST: NewsArticles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "StaffOnly")]
-        public async Task<IActionResult> Create([Bind("NewsArticleId,NewsTitle,Headline,NewsSource,NewsContent,CategoryId,NewsStatus,CreatedById,UpdatedById,CreatedDate,ModifiedDate")] NewsArticle newsArticle, [FromForm]  List<int> TagIds)
+        public async Task<IActionResult> CreatePartial([Bind("NewsArticleId,NewsTitle,Headline,NewsSource,NewsContent,CategoryId,NewsStatus,CreatedById,UpdatedById,CreatedDate,ModifiedDate")] NewsArticle newsArticle, [FromForm] List<int> TagIds)
         {
+
+
             if (string.IsNullOrEmpty(newsArticle.NewsArticleId))
             {
-                newsArticle.NewsArticleId = Guid.NewGuid().ToString("N").Substring(0, 20); // 20 ký tự
+                newsArticle.NewsArticleId = Guid.NewGuid().ToString("N").Substring(0, 20); // Generate a 20-character GUID
             }
 
-
+            // Set created and updated user IDs from claims
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Console.WriteLine($"UserId Claim: {userIdValue}");
-
             if (!string.IsNullOrEmpty(userIdValue) && short.TryParse(userIdValue, out short staffId))
             {
                 newsArticle.CreatedById = staffId;
                 newsArticle.UpdatedById = staffId;
-                Console.WriteLine($"Assigned CreatedById: {staffId}");
-            }
-            else
-            {
-                Console.WriteLine("Failed to parse AccountId from claim.");
             }
 
-        
-
-        newsArticle.CreatedDate = DateTime.Now;
+            // Set creation and modification timestamps
+            newsArticle.CreatedDate = DateTime.Now;
             newsArticle.ModifiedDate = DateTime.Now;
 
+            // Save the article and its tags
             await _newsArticleService.AddNewsArticleAsync(newsArticle, TagIds);
+
+
+
+            // Return the updated view
             return RedirectToAction(nameof(Index));
         }
 
+
         // GET: NewsArticles/Edit/5
         [Authorize(Policy = "StaffOnly")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> EditPartial(string id)
         {
             var article = await _newsArticleService.GetNewsArticleByIdAsync(id);
             if (article == null)
@@ -96,34 +101,41 @@ namespace FUNews.MVC.Controllers
                 return NotFound();
             }
 
+            var selectedTagIds = article.Tags?.Select(t => t.TagId).ToList() ?? new List<int>();
+            ViewBag.SelectedTagIds = selectedTagIds;
+
             ViewBag.CategoryId = new SelectList(
                 await _categoryService.GetAllCategoriesAsync(),
                 "CategoryId",
                 "CategoryName",
                 article.CategoryId);
 
-            ViewBag.TagIds = new MultiSelectList(
-                await _tagService.GetAllTagsAsync(),
-                "TagId",
-                "TagName",
-                article.Tags.Select(t => t.TagId));
+            var allTags = await _tagService.GetAllTagsAsync();
+            ViewBag.TagIds = allTags
+                .Select(t => new { Value = t.TagId, Text = t.TagName })
+                .ToList();
 
-            return View(article);
+            return PartialView("EditPartial", article);
         }
+
 
         // POST: NewsArticles/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "StaffOnly")]
-        public async Task<IActionResult> Edit(
-    string id,
-    [Bind("NewsArticleId,NewsTitle,Headline,NewsSource,NewsContent,CategoryId,NewsStatus,CreatedById,UpdatedById,CreatedDate,ModifiedDate")] NewsArticle newsArticle,
-    [FromForm] List<int> TagIds)
+        public async Task<IActionResult> EditPartial(string id, [Bind("NewsArticleId,NewsTitle,Headline,NewsSource,NewsContent,CategoryId,NewsStatus,CreatedById,UpdatedById,CreatedDate,ModifiedDate")] NewsArticle newsArticle, [FromForm] List<int> TagIds)
         {
+            Console.WriteLine($"TagIds count: {TagIds?.Count ?? 0}");
             if (id != newsArticle.NewsArticleId)
             {
                 return NotFound();
             }
+            if (newsArticle == null)
+            {
+                return NotFound(); // Nếu null, trả về NotFound
+            }
+     
+
 
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(userIdValue) && short.TryParse(userIdValue, out short staffId))
@@ -133,26 +145,19 @@ namespace FUNews.MVC.Controllers
 
             newsArticle.ModifiedDate = DateTime.Now;
 
-            if (ModelState.IsValid)
-            {
-                await _newsArticleService.UpdateNewsArticleAsync(newsArticle, TagIds);
-                return RedirectToAction(nameof(Index));
-            }
+            Console.WriteLine($"[DEBUG] ID: {id}");
+            Console.WriteLine($"[DEBUG] NewsArticleId: {newsArticle.NewsArticleId}");
+            Console.WriteLine($"[DEBUG] NewsTitle: {newsArticle.NewsTitle}");
+            Console.WriteLine($"[DEBUG] Headline: {newsArticle.Headline}");
+            Console.WriteLine($"[DEBUG] CategoryId: {newsArticle.CategoryId}");
+            Console.WriteLine($"[DEBUG] TagIds Count: {TagIds?.Count ?? 0}");
+            Console.WriteLine($"[DEBUG] TagIds: {string.Join(", ", TagIds ?? new List<int>())}");
 
-            ViewBag.CategoryId = new SelectList(
-                await _categoryService.GetAllCategoriesAsync(),
-                "CategoryId",
-                "CategoryName",
-                newsArticle.CategoryId);
 
-            ViewBag.TagIds = new MultiSelectList(
-                await _tagService.GetAllTagsAsync(),
-                "TagId",
-                "TagName",
-                TagIds);
-
-            return View(newsArticle);
+            await _newsArticleService.UpdateNewsArticleAsync(newsArticle, TagIds);
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: NewsArticles/Delete/5
         [Authorize(Policy = "StaffOnly")]
