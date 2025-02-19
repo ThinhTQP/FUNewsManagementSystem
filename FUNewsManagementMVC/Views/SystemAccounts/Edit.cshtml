@@ -25,7 +25,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="AccountRole" class="control-label"></label>
-                <input asp-for="AccountRole" class="form-control" />
+                <select asp-for="AccountRole" class="form-control">
+                    <option value="1">Staff</option>
+                    <option value="2">Lecturer</option>
+                </select>
                 <span asp-validation-for="AccountRole" class="text-danger"></span>
             </div>
             <div class="form-group">
