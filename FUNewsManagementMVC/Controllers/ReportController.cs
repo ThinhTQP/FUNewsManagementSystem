@@ -33,6 +33,8 @@ namespace FUNewsManagementMVC.Controllers
             if (endDate.HasValue)
                 articles = articles.Where(a => a.ModifiedDate <= endDate.Value).ToList();
 
+            articles = articles.OrderByDescending(a => a.ModifiedDate).ToList();
+
             return View("Index", articles);
         }
 
