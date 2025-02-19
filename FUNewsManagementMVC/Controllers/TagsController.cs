@@ -15,9 +15,9 @@ namespace FUNewsManagementMVC.Controllers
     [Authorize(Policy = "StaffOnly")]
     public class TagsController : Controller
     {
-        private readonly TagService _tagService;
+        private readonly ITagService _tagService;
 
-        public TagsController(TagService tagService)
+        public TagsController(ITagService tagService)
         {
             _tagService = tagService;
         }

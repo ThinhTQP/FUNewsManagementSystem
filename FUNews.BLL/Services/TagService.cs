@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FUNews.BLL.Services
 {
-    public class TagService
+    public class TagService : ITagService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGenericRepository<Tag, int> _tagRepository;
@@ -39,7 +39,7 @@ namespace FUNews.BLL.Services
                 throw new ArgumentNullException(nameof(tag));
 
             _tagRepository.Create(tag);
-            await _unitOfWork.SaveChange(); // Save changes using UnitOfWork
+            await _unitOfWork.SaveChange(); 
         }
 
         // Update an existing tag
@@ -49,7 +49,7 @@ namespace FUNews.BLL.Services
                 throw new ArgumentNullException(nameof(tag));
 
             _tagRepository.Update(tag);
-            await _unitOfWork.SaveChange(); // Save changes using UnitOfWork
+            await _unitOfWork.SaveChange(); 
         }
 
         // Delete a tag by ID
@@ -61,7 +61,7 @@ namespace FUNews.BLL.Services
             if (tag.NewsArticles != null && tag.NewsArticles.Any())
                 throw new InvalidOperationException("Cannot delete this category because it is associated with one or more news articles.");
             _tagRepository.Delete(tag);
-            await _unitOfWork.SaveChange(); // Save changes using UnitOfWork
+            await _unitOfWork.SaveChange(); 
         }
     }
 }

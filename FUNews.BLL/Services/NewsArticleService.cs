@@ -3,7 +3,7 @@ using FUNews.DAL.Entities;
 using FUNews.DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-public class NewsArticleService
+public class NewsArticleService : INewsArticleService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IGenericRepository<NewsArticle, string> _newsArticleRepository;
@@ -103,7 +103,7 @@ public class NewsArticleService
         _newsArticleRepository.Update(newsArticle);
         await _unitOfWork.SaveChange();
     }
-    // Lấy bài viết cho Lecturer (chỉ bài viết Active)
+    // Lấy bài viết cho Lecturer Active 
     public async Task<IEnumerable<NewsArticle>> GetActiveNewsForLecturerAsync()
     {
         return await _newsArticleRepository

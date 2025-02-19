@@ -11,9 +11,9 @@ namespace FUNewsManagementMVC.Controllers
 {
     public class ReportController : Controller
     {
-        private readonly NewsArticleService _newsArticleService;
+        private readonly INewsArticleService _newsArticleService;
 
-        public ReportController(NewsArticleService newsArticleService)
+        public ReportController(INewsArticleService newsArticleService)
         {
             _newsArticleService = newsArticleService;
         }

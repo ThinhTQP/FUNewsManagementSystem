@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FUNews.BLL.Services
 {
-    public class SystemAccountService
+    public class SystemAccountService : ISystemAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGenericRepository<SystemAccount, short> _systemAccountRepository;

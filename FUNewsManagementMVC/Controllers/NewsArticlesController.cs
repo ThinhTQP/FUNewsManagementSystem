@@ -11,11 +11,11 @@ namespace FUNews.MVC.Controllers
 
     public class NewsArticlesController : Controller
     {
-        private readonly NewsArticleService _newsArticleService;
-        private readonly CategoryService _categoryService;
-        private readonly TagService _tagService;
+        private readonly INewsArticleService _newsArticleService;
+        private readonly ICategoryService _categoryService;
+        private readonly ITagService _tagService;
 
-        public NewsArticlesController(NewsArticleService newsArticleService, CategoryService categoryService, TagService tagService)
+        public NewsArticlesController(INewsArticleService newsArticleService, ICategoryService categoryService, ITagService tagService)
         {
             _newsArticleService = newsArticleService;
             _categoryService = categoryService;

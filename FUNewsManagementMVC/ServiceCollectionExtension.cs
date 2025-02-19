@@ -22,10 +22,11 @@ namespace FUNewsManagementMVC
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
-            services.AddScoped<CategoryService>();
-            services.AddScoped<TagService>();
-            services.AddScoped<NewsArticleService>();
-            services.AddScoped<SystemAccountService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+
+            services.AddScoped<ITagService, TagService>();
+            services.AddScoped<INewsArticleService, NewsArticleService>();
+            services.AddScoped<ISystemAccountService, SystemAccountService>();
         }
         public static void AddAuthen(this IServiceCollection services)
         {

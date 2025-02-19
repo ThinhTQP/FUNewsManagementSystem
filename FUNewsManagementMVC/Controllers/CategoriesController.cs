@@ -10,9 +10,9 @@ namespace FUNews.MVC.Controllers
     [Authorize(Policy = "StaffOnly")]
     public class CategoriesController : Controller
     {
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        public CategoriesController(CategoryService categoryService)
+        public CategoriesController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }

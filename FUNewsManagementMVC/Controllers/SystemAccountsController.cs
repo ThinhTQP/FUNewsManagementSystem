@@ -13,10 +13,10 @@ namespace FUNewsManagementMVC.Controllers
     [Authorize]
     public class SystemAccountsController : Controller
     {
-        private readonly SystemAccountService _accountService;
+        private readonly ISystemAccountService _accountService;
         private readonly IConfiguration _config;
 
-        public SystemAccountsController(SystemAccountService accountService, IConfiguration config)
+        public SystemAccountsController(ISystemAccountService accountService, IConfiguration config)
         {
             _accountService = accountService;
             _config = config;
