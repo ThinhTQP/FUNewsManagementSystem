@@ -21,6 +21,7 @@ namespace FUNewsManagementMVC.Controllers
         public async Task<IActionResult> Index()
         {
             var articles = await _newsArticleService.GetAllNewsArticlesAsync();
+            articles = articles.OrderByDescending(a => a.CreatedDate).ToList();
             return View(articles);
         }
 
@@ -29,14 +30,15 @@ namespace FUNewsManagementMVC.Controllers
             var articles = await _newsArticleService.GetAllNewsArticlesAsync();
 
             if (startDate.HasValue)
-                articles = articles.Where(a => a.ModifiedDate >= startDate.Value).ToList();
+                articles = articles.Where(a => a.CreatedDate >= startDate.Value).ToList();
             if (endDate.HasValue)
-                articles = articles.Where(a => a.ModifiedDate <= endDate.Value).ToList();
+                articles = articles.Where(a => a.CreatedDate <= endDate.Value).ToList();
 
-            articles = articles.OrderByDescending(a => a.ModifiedDate).ToList();
+            articles = articles.OrderByDescending(a => a.CreatedDate).ToList();
 
             return View("Index", articles);
         }
+
 
         public async Task<IActionResult> ExportToPDF(DateTime? startDate, DateTime? endDate)
         {
@@ -46,6 +48,7 @@ namespace FUNewsManagementMVC.Controllers
                 articles = articles.Where(a => a.ModifiedDate >= startDate.Value).ToList();
             if (endDate.HasValue)
                 articles = articles.Where(a => a.ModifiedDate <= endDate.Value).ToList();
+            articles = articles.OrderByDescending(a => a.CreatedDate).ToList();
 
             using (MemoryStream stream = new MemoryStream())
             {
