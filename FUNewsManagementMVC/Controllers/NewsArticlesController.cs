@@ -48,7 +48,7 @@ namespace FUNews.MVC.Controllers
         public async Task<IActionResult> CreatePartial()
         {
             // Fetch categories and tags for the select lists
-            ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategoriesAsync(), "CategoryId", "CategoryName");
+            ViewBag.CategoryId = new SelectList(await _categoryService.GetActiveCategoriesAsync(), "CategoryId", "CategoryName");
             var tags = await _tagService.GetAllTagsAsync();
             ViewBag.TagIds = new MultiSelectList(tags, "TagId", "TagName");
 
@@ -105,7 +105,7 @@ namespace FUNews.MVC.Controllers
             ViewBag.SelectedTagIds = selectedTagIds;
 
             ViewBag.CategoryId = new SelectList(
-                await _categoryService.GetAllCategoriesAsync(),
+                await _categoryService.GetActiveCategoriesAsync(),
                 "CategoryId",
                 "CategoryName",
                 article.CategoryId);

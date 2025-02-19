@@ -64,5 +64,14 @@ namespace FUNews.BLL.Services
             _categoryRepository.Delete(category);
             await _unitOfWork.SaveChange(); // Lưu thay đổi bằng UnitOfWork
         }
+
+        
+        public async Task<IEnumerable<Category>> GetActiveCategoriesAsync()
+        {
+            return await _categoryRepository
+                .FindAll(c => c.IsActive == true) // Lọc theo IsActive
+                .ToListAsync();
+        }
+
     }
 }
