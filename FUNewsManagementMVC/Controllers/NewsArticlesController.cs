@@ -182,5 +182,15 @@ namespace FUNews.MVC.Controllers
             var news = await _newsArticleService.GetActiveNewsForLecturerAsync();
             return View(news);
         }
+        [Authorize(Policy = "LecturerOnly")]
+        public async Task<IActionResult> LecturerNewDetails(string id)
+        {
+            var article = await _newsArticleService.GetNewsArticleByIdAsync(id);
+            if (article == null)
+            {
+                return NotFound();
+            }
+            return View(article);
+        }
     }
 }
