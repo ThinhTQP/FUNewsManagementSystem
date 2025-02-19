@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "AccessDenied";
+}
+
+<div class="text-center mt-5">
+    <h2 class="text-danger">🚫 Access Denied</h2>
+    <p class="text-muted">You do not have permission to access this page.</p>
+
+    <div class="mt-4">
+        <a class="btn btn-secondary me-2" onclick="history.back()">🔙 Go Back</a>
+
+        <form asp-controller="SystemAccounts" asp-action="Logout" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger">🚪 Logout</button>
+        </form>
+    </div>
+</div>

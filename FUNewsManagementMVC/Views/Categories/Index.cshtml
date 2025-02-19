@@ -1,0 +1,42 @@
+﻿@model IEnumerable<FUNews.DAL.Entities.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<h1>Categories</h1>
+<form asp-controller="SystemAccounts" asp-action="Logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+<p>
+    <a class="btn btn-primary" href="@Url.Action("Create")">Create New Category</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.CategoryName)</th>
+            <th>@Html.DisplayNameFor(model => model.CategoryDesciption)</th>
+            <th>@Html.DisplayNameFor(model => model.IsActive)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.CategoryName</td>
+                <td>@category.CategoryDesciption</td>
+                <td>@category.IsActive</td>
+                <td>
+                    <a href="@Url.Action("Details", new { id = category.CategoryId })">Details</a> |
+                    <a href="@Url.Action("Edit", new { id = category.CategoryId })">Edit</a> |
+                    <a href="@Url.Action("Delete", new { id = category.CategoryId })">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
