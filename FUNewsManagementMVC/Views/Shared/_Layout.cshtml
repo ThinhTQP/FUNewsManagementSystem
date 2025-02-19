@@ -46,9 +46,18 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item d-flex align-items-center me-3">
-                                <a class="nav-link text-dark" asp-controller="SystemAccounts" asp-action="EditProfile">
-                                    Hello, @User.Identity.Name
-                                </a>
+                                @if (User.IsInRole("Staff"))
+                                {
+                                    <a class="nav-link text-dark" asp-controller="SystemAccounts" asp-action="EditProfile">
+                                        Hello, @User.Identity.Name
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="nav-link text-secondary">
+                                        Hello, @User.Identity.Name
+                                    </span>
+                                }
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="SystemAccounts" asp-action="Logout" method="post" class="d-inline">
