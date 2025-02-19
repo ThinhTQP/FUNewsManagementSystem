@@ -1,0 +1,38 @@
+﻿@model FUNews.DAL.Entities.SystemAccount
+
+@{
+    Layout = null;
+}
+
+<form id="editAccountForm" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="AccountId" />
+    <div class="mb-3">
+        <label asp-for="AccountName" class="form-label">👤 Account Name</label>
+        <input asp-for="AccountName" class="form-control" />
+        <span asp-validation-for="AccountName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="AccountEmail" class="form-label">📧 Email</label>
+        <input asp-for="AccountEmail" class="form-control" />
+        <span asp-validation-for="AccountEmail" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="AccountRole" class="form-label">🎭 Role</label>
+        <select asp-for="AccountRole" class="form-control">
+            <option value="1">Staff</option>
+            <option value="2">Lecturer</option>
+        </select>
+        <span asp-validation-for="AccountRole" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="AccountPassword" class="form-label">🔒 Password</label>
+        <input asp-for="AccountPassword" class="form-control" />
+        <span asp-validation-for="AccountPassword" class="text-danger"></span>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+        <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+    </div>
+</form>

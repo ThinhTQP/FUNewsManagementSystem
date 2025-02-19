@@ -129,16 +129,15 @@ namespace FUNewsManagementMVC.Controllers
         }
 
         [Authorize(Policy = "AdminOnly")]
-        public IActionResult Create()
+        public IActionResult CreatePartial()
         {
-       
-            return View();
+            return PartialView("CreatePartial", new SystemAccount());
         }
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SystemAccount systemAccount)
+        public async Task<IActionResult> CreatePartial(SystemAccount systemAccount)
         {
             if (ModelState.IsValid)
             {
@@ -146,45 +145,34 @@ namespace FUNewsManagementMVC.Controllers
                         .Max(t => (short?)t.AccountId) ?? 0;
                 systemAccount.AccountId = (short)(maxId + 1);
                 await _accountService.AddSystemAccountAsync(systemAccount);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index)); // ✅ Redirect khi thành công
             }
-          
-            return View(systemAccount);
+
+            return PartialView("CreatePartial", systemAccount); // ❌ Hiện lại form khi có lỗi
         }
 
-        [Authorize]
-        public async Task<IActionResult> Edit(short id)
+        [HttpGet]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> EditPartial(short id)
         {
             var account = await _accountService.GetSystemAccountByIdAsync(id);
-            if (account == null)
-                return NotFound();
-            return View(account);
+            if (account == null) return NotFound();
+            return PartialView("EditPartial", account);
         }
 
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(short id, SystemAccount systemAccount)
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> EditPartial(SystemAccount systemAccount)
         {
-            if (id != systemAccount.AccountId)
-                return BadRequest();
-
             if (ModelState.IsValid)
             {
                 await _accountService.UpdateSystemAccountAsync(systemAccount);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index)); // ✅ Redirect khi thành công
             }
-            return View(systemAccount);
+            return PartialView("EditPartial", systemAccount); // ❌ Hiện form lại khi lỗi
         }
 
-        [Authorize(Policy = "AdminOnly")]
-        public async Task<IActionResult> Delete(short id)
-        {
-            var account = await _accountService.GetSystemAccountByIdAsync(id);
-            if (account == null)
-                return NotFound();
-            return View(account);
-        }
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPost, ActionName("Delete")]
@@ -194,5 +182,6 @@ namespace FUNewsManagementMVC.Controllers
             await _accountService.DeleteSystemAccountAsync(id);
             return RedirectToAction(nameof(Index));
         }
+
     }
 }

@@ -1,66 +1,225 @@
 ﻿@model IEnumerable<FUNews.DAL.Entities.SystemAccount>
 
 @{
-    ViewData["Title"] = "Index";
-}
-@if (User.Identity.IsAuthenticated)
-{
-    <p>Hello, @User.Identity.Name!</p>
-
-}
-else
-{
-    <a asp-controller="Account" asp-action="Login">Login</a>
+    ViewData["Title"] = "Account Management";
 }
 
-<h1>Index</h1>
-<form asp-controller="SystemAccounts" asp-action="Logout" method="post">
-    <button type="submit">Logout</button>
-</form>
-<h1>Index</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AccountName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AccountEmail)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AccountRole)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AccountPassword)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountRole)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccountPassword)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AccountId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AccountId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AccountId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">@ViewData["Title"]</h1>
+        </div>
+
+        <!-- Nút tạo mới -->
+        <div class="mb-3">
+            <button id="openCreateModal" class="btn btn-success">
+                ➕ Create New Account
+            </button>
+        </div>
+
+        <!-- Bảng danh sách tài khoản -->
+        <div class="table-responsive shadow-sm rounded bg-white p-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>👤 Account Name</th>
+                        <th>📧 Email</th>
+                        <th>🛡️ Role</th>
+                        <th>🔒 Password</th>
+                        <th class="text-center">⚡ Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.AccountName</td>
+                            <td>@item.AccountEmail</td>
+                            <td>
+                                <span class="badge bg-@(item.AccountRole == 1 ? "primary" : "secondary")">
+                                    @(item.AccountRole == 1 ? "Staff" : "Lecturer")
+                                </span>
+                            </td>
+                            <td>••••••••</td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.AccountId" class="btn btn-sm btn-outline-primary me-1">
+                                    👁️ View
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-warning me-1 edit-account-btn" data-id="@item.AccountId">
+                                    ✏️ Edit
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-account-btn" data-id="@item.AccountId" data-name="@item.AccountName">
+                                    🗑️ Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Create Popup -->
+    <div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createModalLabel">✨ Create New Account</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Popup -->
+    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editModalLabel">📝 Edit Account</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="editModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Delete Confirmation -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">🗑️ Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="deleteModalContent">
+                    @Html.AntiForgeryToken()
+                    <p>⚠️ Are you sure you want to delete <strong id="deleteAccountName"></strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger">🗑️ Confirm Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Create Account Script -->
+    <script>
+        document.getElementById('openCreateModal').addEventListener('click', function () {
+            fetch('/SystemAccounts/CreatePartial')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('modalContent').innerHTML = html;
+                    const modal = new bootstrap.Modal(document.getElementById('createAccountModal'));
+                    modal.show();
+
+                    document.getElementById('createAccountForm').addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const form = this;
+                        const formData = new URLSearchParams(new FormData(form)).toString();
+                        const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                        fetch('/SystemAccounts/CreatePartial', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'RequestVerificationToken': token
+                            },
+                            body: formData
+                        })
+                            .then(response => response.redirected ? window.location.href = response.url : response.text())
+                            .then(data => { if (data) document.getElementById('modalContent').innerHTML = data; })
+                            .catch(() => alert('⚡ Có lỗi xảy ra khi gửi form.'));
+                    });
+                });
+        });
+    </script>
+
+    <!-- Edit Account Script -->
+    <script>
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('edit-account-btn')) {
+                const accountId = e.target.getAttribute('data-id');
+                fetch(`/SystemAccounts/EditPartial/${accountId}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('editModalContent').innerHTML = html;
+                        const modal = new bootstrap.Modal(document.getElementById('editAccountModal'));
+                        modal.show();
+
+                        document.getElementById('editAccountForm').addEventListener('submit', function (e) {
+                            e.preventDefault();
+                            const form = this;
+                            const formData = new URLSearchParams(new FormData(form)).toString();
+                            const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                            fetch('/SystemAccounts/EditPartial', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'RequestVerificationToken': token
+                                },
+                                body: formData
+                            })
+                                .then(response => response.redirected ? window.location.href = response.url : response.text())
+                                .then(data => { if (data) document.getElementById('editModalContent').innerHTML = data; })
+                                .catch(() => alert('⚡ Có lỗi xảy ra khi cập nhật tài khoản.'));
+                        });
+                    })
+                    .catch(() => alert('⚡ Không thể tải dữ liệu chỉnh sửa.'));
+            }
+        });
+    </script>
+
+    <!-- Delete Account Script -->
+    <script>
+        let deleteAccountId;
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('delete-account-btn')) {
+                deleteAccountId = e.target.getAttribute('data-id');
+                const accountName = e.target.getAttribute('data-name');
+                document.getElementById('deleteAccountName').textContent = accountName;
+                const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+                modal.show();
+            }
+        });
+
+                              document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value; // ✅ Lấy token
+            fetch(`/SystemAccounts/Delete/${deleteAccountId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `__RequestVerificationToken=${token}`
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url; // ✅ Xóa thành công reload trang
+                } else {
+                    alert('❌ Xóa thất bại.');
+                }
+            })
+            .catch(() => alert('⚡ Có lỗi xảy ra khi xóa tài khoản.'));
+        });
+
+
+
+    </script>
+
+</body>
+</html>
