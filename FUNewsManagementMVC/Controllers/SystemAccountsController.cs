@@ -183,5 +183,59 @@ namespace FUNewsManagementMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+
+        [Authorize]
+        public async Task<IActionResult> EditProfile()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !short.TryParse(userIdClaim, out short userId))
+            {
+                return Unauthorized();
+            }
+
+            var account = await _accountService.GetSystemAccountByIdAsync(userId);
+            if (account == null) return NotFound();
+
+            return View("EditProfile", account);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> EditProfile(SystemAccount systemAccount, string OldPassword, string NewPassword)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !short.TryParse(userIdClaim, out short userId))
+            {
+                return Unauthorized();
+            }
+
+            if (userId != systemAccount.AccountId) return Forbid();
+
+            var existingAccount = await _accountService.GetSystemAccountByIdAsync(userId);
+            if (existingAccount == null) return NotFound();
+
+            // Kiểm tra nếu người dùng nhập mật khẩu cũ và mới
+            if (!string.IsNullOrEmpty(OldPassword) && !string.IsNullOrEmpty(NewPassword))
+            {
+                if (existingAccount.AccountPassword != OldPassword)
+                {
+                    TempData["ErrorMessage"] = "Old password is incorrect!";
+                    return View("EditProfile", systemAccount);
+                }
+
+                // Cập nhật mật khẩu mới
+                existingAccount.AccountPassword = NewPassword;
+            }
+
+            // Cập nhật thông tin tài khoản khác (trừ Email và Role)
+            existingAccount.AccountName = systemAccount.AccountName;
+
+            await _accountService.UpdateSystemAccountAsync(existingAccount);
+            TempData["SuccessMessage"] = "Profile updated successfully!";
+
+            return RedirectToAction("EditProfile");
+        }
     }
 }
