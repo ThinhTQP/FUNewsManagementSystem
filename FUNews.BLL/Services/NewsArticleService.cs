@@ -98,7 +98,11 @@ public class NewsArticleService
         _newsArticleRepository.Delete(newsArticle);
         await _unitOfWork.SaveChange();
     }
-
+    public async Task UpdateNewsArticleAsync(NewsArticle newsArticle)
+    {
+        _newsArticleRepository.Update(newsArticle);
+        await _unitOfWork.SaveChange();
+    }
     // Lấy bài viết cho Lecturer (chỉ bài viết Active)
     public async Task<IEnumerable<NewsArticle>> GetActiveNewsForLecturerAsync()
     {

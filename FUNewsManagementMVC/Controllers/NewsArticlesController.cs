@@ -177,7 +177,16 @@ namespace FUNews.MVC.Controllers
         [Authorize(Policy = "StaffOnly")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            await _newsArticleService.DeleteNewsArticleAsync(id);
+            var newsArticle = await _newsArticleService.GetNewsArticleByIdAsync(id);
+            if (newsArticle == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật trạng thái thành Inactive
+            newsArticle.NewsStatus = false;
+            await _newsArticleService.UpdateNewsArticleAsync(newsArticle);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -195,6 +204,7 @@ namespace FUNews.MVC.Controllers
             {
                 return NotFound();
             }
+
             return View(article);
         }
     }
