@@ -66,5 +66,15 @@ namespace FUNewsManagementMVC.Controllers
                 return File(stream.ToArray(), "application/pdf", "NewsReport.pdf");
             }
         }
+
+        public async Task<IActionResult> NewDetails(string id)
+        {
+            var article = await _newsArticleService.GetNewsArticleByIdAsync(id);
+            if (article == null)
+            {
+                return NotFound();
+            }
+            return View(article);
+        }
     }
 }
