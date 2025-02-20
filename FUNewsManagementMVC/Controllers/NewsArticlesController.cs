@@ -30,6 +30,19 @@ namespace FUNews.MVC.Controllers
             return View(articles);
         }
 
+        //search
+        public async Task<IActionResult> Search(string searchString)
+        {
+            var articles = await _newsArticleService.GetAllNewsArticlesAsync();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                articles = articles.Where(a => a.NewsTitle.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            return View("Index", articles);
+        }
+
         // GET: NewsArticles/Details/5
         [Authorize(Policy = "StaffOnly")]
         public async Task<IActionResult> Details(string id)

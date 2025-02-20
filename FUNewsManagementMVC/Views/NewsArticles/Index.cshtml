@@ -23,6 +23,11 @@
             <button id="openCreateNewsModal" class="btn btn-success shadow-sm">➕ Create New Article</button>
         </div>
 
+        <form asp-action="Search" method="get">
+            <input type="text" name="searchString" placeholder="Search articles..." value="@Context.Request.Query["searchString"]" />
+            <button type="submit">Search</button>
+        </form>
+
         <!-- Bảng danh sách bài viết -->
         <div class="table-responsive shadow-sm rounded bg-white p-3">
             <table class="table table-hover align-middle">
