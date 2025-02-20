@@ -60,12 +60,15 @@ namespace FUNews.BLL.Services
             if (category == null)
                 throw new ArgumentException("Category not found");
             if (category.NewsArticles != null && category.NewsArticles.Any())
+            {
+                Console.WriteLine("⚡ Category has associated articles.");
                 throw new InvalidOperationException("Cannot delete this category because it is associated with one or more news articles.");
+            }
+                
             _categoryRepository.Delete(category);
             await _unitOfWork.SaveChange();
         }
-
-        
+    
         public async Task<IEnumerable<Category>> GetActiveCategoriesAsync()
         {
             return await _categoryRepository

@@ -1,0 +1,46 @@
+﻿@model FUNews.DAL.Entities.Category
+@{
+    Layout = null;
+}
+
+<form id="editCategoryForm" method="post">
+    @Html.AntiForgeryToken() <!-- ✅ CSRF token bắt buộc -->
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+  
+    <input type="hidden" name="id" value="@Model.CategoryId" />
+    <input type="hidden" name="CategoryId" value="@Model.CategoryId" />
+    <div class="mb-3">
+        <label asp-for="CategoryName" class="form-label">📛 Category Name</label>
+        <input asp-for="CategoryName" class="form-control" />
+        <span asp-validation-for="CategoryName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryDesciption" class="form-label">📝 Description</label>
+        <input asp-for="CategoryDesciption" class="form-control" />
+        <span asp-validation-for="CategoryDesciption" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ParentCategoryId" class="form-label">🔗 Parent Category</label>
+        <select asp-for="ParentCategoryId" class="form-select" asp-items="ViewBag.ParentCategoryId">
+            <option value="">-- Select Parent Category --</option>
+        </select>
+        <span asp-validation-for="ParentCategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label for="isActiveSelect" class="form-label">✅ Active Status</label>
+        <select id="isActiveSelect" class="form-select" asp-for="IsActive">
+            <option value="true" selected>Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+    <div class="modal-footer">
+        <a asp-action="Index" class="btn btn-secondary">🔙 Back to List</a>
+        <button type="submit" class="btn btn-primary">✅ Update</button>
+    </div>
+</form>
+
+
+

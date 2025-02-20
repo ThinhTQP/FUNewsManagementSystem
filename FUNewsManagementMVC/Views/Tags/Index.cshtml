@@ -1,43 +1,64 @@
 ﻿@model IEnumerable<FUNews.DAL.Entities.Tag>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Tag Management";
 }
-<form asp-controller="SystemAccounts" asp-action="Logout" method="post">
-    <button type="submit">Logout</button>
-</form>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TagName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Note)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TagName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Note)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.TagId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TagId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TagId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold text-primary">@ViewData["Title"]</h1>
+            <form asp-controller="SystemAccounts" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-outline-danger shadow-sm">🔓 Logout</button>
+            </form>
+        </div>
 
+        <!-- Nút tạo mới -->
+        <div class="mb-3">
+            <a asp-action="Create" class="btn btn-success shadow-sm">➕ Create New Tag</a>
+        </div>
+
+        <!-- Bảng danh sách Tag -->
+        <div class="table-responsive shadow-sm rounded bg-white p-3">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#️⃣ No.</th>
+                        <th>🏷️ Tag Name</th>
+                        <th>📝 Note</th>
+                        <th class="text-center">⚡ Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var index = 1;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td>@item.TagName</td>
+                            <td>@item.Note</td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.TagId" class="btn btn-sm btn-outline-primary me-1">👁️ Details</a>
+                                <a asp-action="Edit" asp-route-id="@item.TagId" class="btn btn-sm btn-warning me-1">✏️ Edit</a>
+                                <a asp-action="Delete" asp-route-id="@item.TagId" class="btn btn-sm btn-danger">🗑️ Delete</a>
+                            </td>
+                        </tr>
+                        index++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

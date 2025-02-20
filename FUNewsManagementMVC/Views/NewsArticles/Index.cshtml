@@ -26,14 +26,14 @@
         <!-- Bảng danh sách bài viết -->
         <div class="table-responsive shadow-sm rounded bg-white p-3">
             <table class="table table-hover align-middle">
-                <thead class="table-primary">
+                <thead class="table-dark">
                     <tr>
                         <th>📜 Title</th>
                         <th>📰 Headline</th>
-                        <th>📖 Content</th>
-                        <th>🔗 Source</th>
-                        <th>📡 Status</th>
-                        <th>🏷️ Category</th>
+                        <th style="width: 30%;">📖 Content</th> <!-- Thu nhỏ cột Content -->
+                        <th> Source</th>
+                        <th>Status</th>
+                     
                         <th class="text-center">⚡ Action</th>
                     </tr>
                 </thead>
@@ -43,24 +43,35 @@
                         <tr>
                             <td>@item.NewsTitle</td>
                             <td>@item.Headline</td>
-                            <td>@item.NewsContent.Substring(0, Math.Min(item.NewsContent.Length, 50))...</td>
+                            <td>
+                                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;"
+                                     title="@item.NewsContent">
+                                    @item.NewsContent
+                                </div>
+                            </td>
                             <td>@item.NewsSource</td>
                             <td>
                                 <span class="badge bg-@(item.NewsStatus ? "success" : "secondary")">
                                     @(item.NewsStatus ? "Active" : "Inactive")
                                 </span>
                             </td>
-                            <td>@item.Category?.CategoryName</td>
+                           
                             <td class="text-center">
-                                <a asp-action="Details" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-outline-primary me-1">👁️ Details</a>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-warning me-1 edit-news-btn" data-id="@item.NewsArticleId">✏️ Edit</a>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-news-btn" data-id="@item.NewsArticleId" data-title="@item.NewsTitle">🗑️ Delete</a>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.NewsArticleId"
+                                       class="btn btn-sm btn-outline-primary">👁️ Details</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-warning edit-news-btn"
+                                       data-id="@item.NewsArticleId">✏️ Edit</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-news-btn"
+                                       data-id="@item.NewsArticleId" data-title="@item.NewsTitle">🗑️ Delete</a>
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
+
     </div>
 
     <!-- Modal Create Popup -->

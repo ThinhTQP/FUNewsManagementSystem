@@ -37,21 +37,22 @@ namespace FUNews.MVC.Controllers
         }
 
         // GET: Categories/Create
-        public async Task<IActionResult> Create()
+        [Authorize(Policy = "StaffOnly")]
+        public async Task<IActionResult> CreatePartial()
         {
             // Lấy tất cả các danh mục từ service để hiển thị trong dropdown
-            var parentCategories = await _categoryService.GetAllCategoriesAsync();
+            var parentCategories = await _categoryService.GetActiveCategoriesAsync();
             // Gán danh sách vào ViewBag để hiển thị trong select list
             ViewBag.ParentCategoryId = new SelectList(parentCategories, "CategoryId", "CategoryName");
 
-            return View();
+            return PartialView("CreatePartial", new Category());
         }
 
 
         // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,CategoryDesciption,ParentCategoryId,IsActive")] Category category)
+        public async Task<IActionResult> CreatePartial([Bind("CategoryId,CategoryName,CategoryDesciption,ParentCategoryId,IsActive")] Category category)
         {
             if (ModelState.IsValid)
             {
@@ -61,40 +62,37 @@ namespace FUNews.MVC.Controllers
             // Nếu có lỗi, truyền lại danh sách ParentCategoryId vào ViewBag để giữ giá trị trong dropdown
             var parentCategories = await _categoryService.GetAllCategoriesAsync();
             ViewBag.ParentCategoryId = new SelectList(parentCategories, "CategoryId", "CategoryName", category.ParentCategoryId);
-            return View(category);
+            return PartialView("CreatePartial", category);
         }
 
         // GET: Categories/Edit/5
-        public async Task<IActionResult> Edit(short id)
+        public async Task<IActionResult> EditPartial(short id)
         {
             var category = await _categoryService.GetCategoryByIdAsync(id);
-            var parentCategories = await _categoryService.GetAllCategoriesAsync();
+            var parentCategories = await _categoryService.GetActiveCategoriesAsync();
             ViewBag.ParentCategoryId = new SelectList(parentCategories, "CategoryId", "CategoryName");
             if (category == null)
             {
                 return NotFound();
             }
-            return View(category);
+            return PartialView("EditPartial", category);
         }
 
         // POST: Categories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(short id, [Bind("CategoryId,CategoryName,CategoryDesciption,ParentCategoryId,IsActive")] Category category)
+        [Authorize(Policy = "StaffOnly")]
+        public async Task<IActionResult> EditPartial(short id, [Bind("CategoryId,CategoryName,CategoryDesciption,ParentCategoryId,IsActive")] Category category)
         {
             if (id != category.CategoryId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            
                 await _categoryService.UpdateCategoryAsync(category);
                 return RedirectToAction(nameof(Index));
-            }
-            var parentCategories = await _categoryService.GetAllCategoriesAsync();
-            ViewBag.ParentCategoryId = new SelectList(parentCategories, "CategoryId", "CategoryName", category.ParentCategoryId);
-            return View(category);
+          
         }
 
         // GET: Categories/Delete/5
@@ -116,19 +114,16 @@ namespace FUNews.MVC.Controllers
             try
             {
                 await _categoryService.DeleteCategoryAsync(id);
+                return Json(new { success = true });
             }
             catch (InvalidOperationException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = false, message = ex.Message });
             }
             catch (ArgumentException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = false, message = ex.Message });
             }
-
-            return RedirectToAction(nameof(Index));
         }
     }
 }
