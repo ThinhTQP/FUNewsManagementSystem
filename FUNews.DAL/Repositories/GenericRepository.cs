@@ -14,13 +14,12 @@ public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey
         _context = context;
     }
 
-    // Find all items with an optional predicate and included properties
+  
     public IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties)
     {
         IQueryable<TEntity> items = _context.Set<TEntity>();
 
-        // Include any related properties if specified
-        if (includeProperties.Any()) // This prevents unnecessary null checks.
+        if (includeProperties.Any()) 
         {
             foreach (var property in includeProperties)
             {
@@ -28,7 +27,7 @@ public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey
             }
         }
 
-        // Apply the predicate if specified
+    
         if (predicate != null)
         {
             items = items.Where(predicate);
@@ -37,7 +36,7 @@ public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey
         return items;
     }
 
-    // Find a specific item by ID with optional related data included
+   
     public async Task<TEntity?> FindById(TKey id, string idPropertyName, params Expression<Func<TEntity, object>>[] includeProperties)
     {
         var query = _context.Set<TEntity>().AsQueryable();
@@ -55,19 +54,17 @@ public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey
 
 
 
-    // Create a new entity
     public void Create(TEntity entity)
     {
         _context.Set<TEntity>().Add(entity);
     }
 
-    // Update an existing entity
     public void Update(TEntity entity)
     {
         _context.Set<TEntity>().Update(entity);
     }
 
-    // Delete an entity
+
     public void Delete(TEntity entity)
     {
         _context.Set<TEntity>().Remove(entity);
@@ -84,7 +81,6 @@ public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey
             return (currentMaxId + 1).ToString();
         }
 
-        // Nếu chưa có dữ liệu, bắt đầu từ 1
         return "1";
     }
 }

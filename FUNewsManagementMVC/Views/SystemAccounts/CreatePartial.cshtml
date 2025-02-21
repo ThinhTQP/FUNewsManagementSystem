@@ -5,17 +5,17 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="mb-3">
         <label asp-for="AccountName" class="form-label">👤 Account Name</label>
-        <input asp-for="AccountName" class="form-control" />
+        <input asp-for="AccountName" class="form-control" required />
         <span asp-validation-for="AccountName" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="AccountEmail" class="form-label">📧 Account Email</label>
-        <input asp-for="AccountEmail" class="form-control" />
+        <input asp-for="AccountEmail" class="form-control" required />
         <span asp-validation-for="AccountEmail" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="AccountRole" class="form-label">🎭 Account Role</label>
-        <select asp-for="AccountRole" class="form-select">
+        <select asp-for="AccountRole" class="form-select" required>
             <option value="1">🌟 Staff</option>
             <option value="2">🎓 Lecturer</option>
         </select>
@@ -23,7 +23,7 @@
     </div>
     <div class="mb-3">
         <label asp-for="AccountPassword" class="form-label">🔒 Password</label>
-        <input asp-for="AccountPassword" type="password" class="form-control" />
+        <input asp-for="AccountPassword" type="password" class="form-control" required />
         <span asp-validation-for="AccountPassword" class="text-danger"></span>
     </div>
     <div class="modal-footer">

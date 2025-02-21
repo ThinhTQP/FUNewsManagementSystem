@@ -17,7 +17,6 @@ namespace FUNews.MVC.Controllers
             _categoryService = categoryService;
         }
 
-        // GET: Categories
         [Authorize(Policy = "StaffOnly")]
         public async Task<IActionResult> Index()
         {

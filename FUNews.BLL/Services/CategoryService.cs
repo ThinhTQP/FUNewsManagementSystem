@@ -14,26 +14,25 @@ namespace FUNews.BLL.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGenericRepository<Category, short> _categoryRepository;
 
-        // Constructor 
+         
         public CategoryService(IGenericRepository<Category, short> categoryRepository, IUnitOfWork unitOfWork)
         {
             _categoryRepository = categoryRepository;
             _unitOfWork = unitOfWork;
         }
 
-        // Lấy tất cả các Category
+      
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
             return await _categoryRepository.FindAll().ToListAsync();
         }
 
-        // Lấy Category theo ID
+      
         public async Task<Category?> GetCategoryByIdAsync(short id)
         {
             return await _categoryRepository.FindById(id, "CategoryId", c => c.ParentCategory);
         }
 
-        // Thêm mới Category
         public async Task AddCategoryAsync(Category category)
         {
             if (category == null)
@@ -43,7 +42,6 @@ namespace FUNews.BLL.Services
             await _unitOfWork.SaveChange();
         }
 
-        // Cập nhật Category
         public async Task UpdateCategoryAsync(Category category)
         {
             if (category == null)
@@ -53,7 +51,6 @@ namespace FUNews.BLL.Services
             await _unitOfWork.SaveChange(); 
         }
 
-        // Xóa Category
         public async Task DeleteCategoryAsync(short id)
         {
             var category = await _categoryRepository.FindById(id, "CategoryId", c => c.NewsArticles);

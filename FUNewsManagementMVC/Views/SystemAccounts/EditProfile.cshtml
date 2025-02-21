@@ -37,7 +37,7 @@
 
                         <div class="form-group mb-3">
                             <label asp-for="AccountName" class="form-label fw-semibold">📝 Full Name</label>
-                            <input asp-for="AccountName" class="form-control shadow-sm" placeholder="Enter your full name" />
+                            <input asp-for="AccountName" class="form-control shadow-sm" placeholder="Enter your full name" required />
                             <span asp-validation-for="AccountName" class="text-danger"></span>
                         </div>
 
@@ -54,12 +54,12 @@
                         <h5 class="fw-bold text-primary mb-3">🔒 Change Password</h5>
                         <div class="form-group mb-3">
                             <label for="OldPassword" class="form-label fw-semibold">🔑 Old Password</label>
-                            <input type="password" name="OldPassword" class="form-control shadow-sm" placeholder="Enter old password" />
+                            <input type="password" name="OldPassword" class="form-control shadow-sm" placeholder="Enter old password" required />
                         </div>
 
                         <div class="form-group mb-4">
                             <label for="NewPassword" class="form-label fw-semibold">✨ New Password</label>
-                            <input type="password" name="NewPassword" class="form-control shadow-sm" placeholder="Enter new password" />
+                            <input type="password" name="NewPassword" class="form-control shadow-sm" placeholder="Enter new password" required />
                         </div>
 
                         <div class="d-flex justify-content-between">

@@ -9,17 +9,17 @@
     <input type="hidden" asp-for="AccountId" />
     <div class="mb-3">
         <label asp-for="AccountName" class="form-label">👤 Account Name</label>
-        <input asp-for="AccountName" class="form-control" />
+        <input asp-for="AccountName" class="form-control" required />
         <span asp-validation-for="AccountName" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="AccountEmail" class="form-label">📧 Email</label>
-        <input asp-for="AccountEmail" class="form-control" />
+        <input asp-for="AccountEmail" class="form-control" required />
         <span asp-validation-for="AccountEmail" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="AccountRole" class="form-label">🎭 Role</label>
-        <select asp-for="AccountRole" class="form-control">
+        <select asp-for="AccountRole" class="form-control" required>
             <option value="1">Staff</option>
             <option value="2">Lecturer</option>
         </select>
@@ -27,7 +27,7 @@
     </div>
     <div class="mb-3">
         <label asp-for="AccountPassword" class="form-label">🔒 Password</label>
-        <input asp-for="AccountPassword" class="form-control" />
+        <input asp-for="AccountPassword" class="form-control" required />
         <span asp-validation-for="AccountPassword" class="text-danger"></span>
     </div>
 
