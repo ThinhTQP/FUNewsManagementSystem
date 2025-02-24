@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FUNews.DAL;
-using FUNews.DAL.Entities;
+using BusinessObjects.Entities;
 using FUNews.BLL.Services;
 using Microsoft.AspNetCore.Authorization;
 

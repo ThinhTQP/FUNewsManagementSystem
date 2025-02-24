@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using FUNews.DAL.Entities;
+using BusinessObjects.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

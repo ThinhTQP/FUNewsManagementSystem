@@ -1,4 +1,4 @@
-﻿using BookApp.Entities;
+﻿using BusinessObjects.Entities;
 using FUNews.DAL.Repositories;
 using FUNews.DAL;
 using Microsoft.EntityFrameworkCore;

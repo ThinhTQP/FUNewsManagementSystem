@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FUNews.DAL.Entities;
+using BusinessObjects.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 

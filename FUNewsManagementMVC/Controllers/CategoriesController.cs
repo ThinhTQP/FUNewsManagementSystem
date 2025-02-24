@@ -1,5 +1,5 @@
 ﻿using FUNews.BLL.Services;
-using FUNews.DAL.Entities;
+using BusinessObjects.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

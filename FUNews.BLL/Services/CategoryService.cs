@@ -1,4 +1,4 @@
-﻿using FUNews.DAL.Entities;
+﻿using BusinessObjects.Entities;
 using FUNews.DAL.Repositories;
 using FUNews.BLL.UnitOfWorks;
 using System;

@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 	<ItemGroup>
+    <ProjectReference Include="..\BusinessObjects\BusinessObjects.csproj" />
     <ProjectReference Include="..\FUNews.BLL\FUNews.BLL.csproj" />
   </ItemGroup>
 
