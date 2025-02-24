@@ -73,16 +73,29 @@ namespace FUNews.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "StaffOnly")]
-        public async Task<IActionResult> CreatePartial([Bind("NewsArticleId,NewsTitle,Headline,NewsSource,NewsContent,CategoryId,NewsStatus,CreatedById,UpdatedById,CreatedDate,ModifiedDate")] NewsArticle newsArticle, [FromForm] List<int> TagIds)
+
+        public async Task<IActionResult> CreatePartial(
+    string? NewsTitle,
+    string Headline,
+    string? NewsSource,
+    string? NewsContent,
+    short? CategoryId,
+    bool NewsStatus,
+    [FromForm] List<int> TagIds)
         {
-
-
-            if (string.IsNullOrEmpty(newsArticle.NewsArticleId))
+            var newsArticle = new NewsArticle
             {
-                newsArticle.NewsArticleId = Guid.NewGuid().ToString("N").Substring(0, 20); // Generate a 20-character GUID
-            }
+                NewsArticleId = Guid.NewGuid().ToString("N").Substring(0, 20), 
+                NewsTitle = NewsTitle,
+                Headline = Headline,
+                NewsSource = NewsSource,
+                NewsContent = NewsContent,
+                CategoryId = CategoryId,
+                NewsStatus = NewsStatus,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now
+            };
 
-            // Set created and updated user IDs from claims
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(userIdValue) && short.TryParse(userIdValue, out short staffId))
             {
@@ -90,21 +103,13 @@ namespace FUNews.MVC.Controllers
                 newsArticle.UpdatedById = staffId;
             }
 
-            // Set creation and modification timestamps
-            newsArticle.CreatedDate = DateTime.Now;
-            newsArticle.ModifiedDate = DateTime.Now;
-
-            // Save the article and its tags
             await _newsArticleService.AddNewsArticleAsync(newsArticle, TagIds);
 
-
-
-            // Return the updated view
             return RedirectToAction(nameof(Index));
         }
 
 
-        // GET: NewsArticles/Edit/5
+
         [Authorize(Policy = "StaffOnly")]
         public async Task<IActionResult> EditPartial(string id)
         {
@@ -136,19 +141,33 @@ namespace FUNews.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "StaffOnly")]
-        public async Task<IActionResult> EditPartial(string id, [Bind("NewsArticleId,NewsTitle,Headline,NewsSource,NewsContent,CategoryId,NewsStatus,CreatedById,UpdatedById,CreatedDate,ModifiedDate")] NewsArticle newsArticle, [FromForm] List<int> TagIds)
+        public async Task<IActionResult> EditPartial(
+    string id,
+    string? NewsTitle,
+    string Headline,
+    string? NewsSource,
+    string? NewsContent,
+    short? CategoryId,
+    bool NewsStatus,
+    [FromForm] List<int> TagIds)
         {
-            Console.WriteLine($"TagIds count: {TagIds?.Count ?? 0}");
+            var newsArticle = await _newsArticleService.GetNewsArticleByIdAsync(id);
+            if (newsArticle == null)
+            {
+                return NotFound();
+            }
+
             if (id != newsArticle.NewsArticleId)
             {
                 return NotFound();
             }
-            if (newsArticle == null)
-            {
-                return NotFound(); // Nếu null, trả về NotFound
-            }
-     
 
+            newsArticle.NewsTitle = NewsTitle;
+            newsArticle.Headline = Headline;
+            newsArticle.NewsSource = NewsSource;
+            newsArticle.NewsContent = NewsContent;
+            newsArticle.CategoryId = CategoryId;
+            newsArticle.NewsStatus = NewsStatus;
 
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(userIdValue) && short.TryParse(userIdValue, out short staffId))
@@ -159,13 +178,11 @@ namespace FUNews.MVC.Controllers
             newsArticle.ModifiedDate = DateTime.Now;
 
             Console.WriteLine($"[DEBUG] ID: {id}");
-            Console.WriteLine($"[DEBUG] NewsArticleId: {newsArticle.NewsArticleId}");
             Console.WriteLine($"[DEBUG] NewsTitle: {newsArticle.NewsTitle}");
             Console.WriteLine($"[DEBUG] Headline: {newsArticle.Headline}");
             Console.WriteLine($"[DEBUG] CategoryId: {newsArticle.CategoryId}");
             Console.WriteLine($"[DEBUG] TagIds Count: {TagIds?.Count ?? 0}");
             Console.WriteLine($"[DEBUG] TagIds: {string.Join(", ", TagIds ?? new List<int>())}");
-
 
             await _newsArticleService.UpdateNewsArticleAsync(newsArticle, TagIds);
             return RedirectToAction(nameof(Index));
@@ -196,7 +213,6 @@ namespace FUNews.MVC.Controllers
                 return NotFound();
             }
 
-            // Cập nhật trạng thái thành Inactive
             newsArticle.NewsStatus = false;
             await _newsArticleService.UpdateNewsArticleAsync(newsArticle);
 
