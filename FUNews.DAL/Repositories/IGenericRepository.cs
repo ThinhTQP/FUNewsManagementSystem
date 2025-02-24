@@ -1,4 +1,4 @@
-﻿using BookApp.Entities;
+﻿using BusinessObjects.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
