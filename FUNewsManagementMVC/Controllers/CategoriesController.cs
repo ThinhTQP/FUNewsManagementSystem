@@ -39,9 +39,7 @@ namespace FUNews.MVC.Controllers
         [Authorize(Policy = "StaffOnly")]
         public async Task<IActionResult> CreatePartial()
         {
-            // Lấy tất cả các danh mục từ service để hiển thị trong dropdown
             var parentCategories = await _categoryService.GetActiveCategoriesAsync();
-            // Gán danh sách vào ViewBag để hiển thị trong select list
             ViewBag.ParentCategoryId = new SelectList(parentCategories, "CategoryId", "CategoryName");
 
             return PartialView("CreatePartial", new Category());
@@ -51,18 +49,37 @@ namespace FUNews.MVC.Controllers
         // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePartial([Bind("CategoryId,CategoryName,CategoryDesciption,ParentCategoryId,IsActive")] Category category)
+        public async Task<IActionResult> CreatePartial(
+    string CategoryName,
+    string CategoryDesciption,
+    short? ParentCategoryId,
+    bool? IsActive)
         {
+            if (string.IsNullOrWhiteSpace(CategoryName) || string.IsNullOrWhiteSpace(CategoryDesciption))
+            {
+                ModelState.AddModelError("", "Tên danh mục và mô tả không được để trống.");
+            }
+
             if (ModelState.IsValid)
             {
+                var category = new Category
+                {
+                    CategoryName = CategoryName,
+                    CategoryDesciption = CategoryDesciption,
+                    ParentCategoryId = ParentCategoryId,
+                    IsActive = IsActive
+                };
+
                 await _categoryService.AddCategoryAsync(category);
                 return RedirectToAction(nameof(Index));
             }
-            // Nếu có lỗi, truyền lại danh sách ParentCategoryId vào ViewBag để giữ giá trị trong dropdown
+
             var parentCategories = await _categoryService.GetAllCategoriesAsync();
-            ViewBag.ParentCategoryId = new SelectList(parentCategories, "CategoryId", "CategoryName", category.ParentCategoryId);
-            return PartialView("CreatePartial", category);
+            ViewBag.ParentCategoryId = new SelectList(parentCategories, "CategoryId", "CategoryName", ParentCategoryId);
+
+            return PartialView("CreatePartial");
         }
+
 
         // GET: Categories/Edit/5
         public async Task<IActionResult> EditPartial(short id)
@@ -81,18 +98,31 @@ namespace FUNews.MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "StaffOnly")]
-        public async Task<IActionResult> EditPartial(short id, [Bind("CategoryId,CategoryName,CategoryDesciption,ParentCategoryId,IsActive")] Category category)
+        public async Task<IActionResult> EditPartial(
+    short id,
+    string CategoryName,
+    string CategoryDesciption,
+    short? ParentCategoryId,
+    bool? IsActive)
         {
-            if (id != category.CategoryId)
+            // Lấy danh mục từ database
+            var category = await _categoryService.GetCategoryByIdAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
 
-            
-                await _categoryService.UpdateCategoryAsync(category);
-                return RedirectToAction(nameof(Index));
-          
+            // Cập nhật thông tin danh mục
+            category.CategoryName = CategoryName;
+            category.CategoryDesciption = CategoryDesciption;
+            category.ParentCategoryId = ParentCategoryId;
+            category.IsActive = IsActive;
+
+            // Lưu cập nhật vào database
+            await _categoryService.UpdateCategoryAsync(category);
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(short id)
